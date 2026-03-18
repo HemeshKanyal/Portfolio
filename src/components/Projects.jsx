@@ -15,16 +15,16 @@ const projectsData = [
     tagline: 'An operating system that understands you.',
     description: 'A next-gen workspace environment where autonomous agents are integrated at the OS level to automate and fluidly assist in complex digital workflows.',
     moreInfo: 'AI OS is built on a custom microkernel architecture that prioritizes agent-to-process communication. It features a natural language shell and a context-aware file system that organizes data based on project relations rather than just directory paths.',
-    github: 'https://github.com/HemeshKanyal/AI-OS',
+    github: null,
     live: '#',
   },
   {
     title: 'TrustChain',
-    tagline: 'Decentralized infrastructure you can verify.',
-    description: 'Core blockchain infrastructure designed for high throughput and verifiable security, focusing on seamless multi-chain interoperability.',
-    moreInfo: 'TrustChain implements a novel consensus mechanism that optimizes for low-latency finality. It includes a built-in bridge protocol and a developer-friendly VM that supports formal verification of smart contracts at compile time.',
-    github: 'https://github.com/HemeshKanyal/TrustChain',
-    live: '#',
+    tagline: 'Decentralized medicine supply chain.',
+    description: 'A blockchain-powered system that tracks medicines from manufacturer to patient, ensuring authenticity, transparency, and trust in the pharmaceutical supply chain.',
+    moreInfo: 'TrustChain is a blockchain-based system that tracks medicines across the entire supply chain — from manufacturer → distributor → pharmacy → doctor → patient.\n\nIt ensures that every medicine can be verified, traced, and trusted at every step, eliminating fraud and increasing transparency in healthcare.\n\n How It Works:\nTrustChain creates a tamper-proof digital trail for every medicine. Manufacturers register medicines with unique IDs (like MED-001) and production data. Distributors and Pharmacies update shipment and inventory records on-chain. Finally, Patients can scan or verify the medicine ID to see the full journey: where it was made, who handled it, and whether it’s genuine.\n\n Key Features:\n End-to-End Traceability\n Tamper-Proof Records\n Medicine Authentication\n Transparency for All Stakeholders\n Trustless System',
+    github: 'https://github.com/HemeshKanyal/trustchain-webpage',
+    live: 'https://trustchain.hemeshkanyal.com/',
   }
 ];
 
@@ -48,7 +48,7 @@ const ProjectModal = ({ project, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
-        <button 
+        <button
           onClick={onClose}
           className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors group"
         >
@@ -66,18 +66,18 @@ const ProjectModal = ({ project, onClose }) => {
         <p className="text-xl md:text-2xl text-accent/90 font-medium mb-8">
           {project.tagline}
         </p>
-        
+
         <div className="space-y-6 mb-10">
-          <p className="text-lg text-foreground/80 leading-relaxed">
+          <p className="text-lg text-foreground/80 leading-relaxed whitespace-pre-wrap">
             {project.moreInfo}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-4">
           {project.github && (
-            <a 
-              href={project.github} 
-              target="_blank" 
+            <a
+              href={project.github}
+              target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-2.5 bg-white text-black font-semibold rounded-full hover:bg-white/90 transition-all flex items-center gap-2"
             >
@@ -85,9 +85,9 @@ const ProjectModal = ({ project, onClose }) => {
             </a>
           )}
           {project.live !== '#' && (
-            <a 
-              href={project.live} 
-              target="_blank" 
+            <a
+              href={project.live}
+              target="_blank"
               rel="noopener noreferrer"
               className="px-6 py-2.5 border border-white/20 text-white font-semibold rounded-full hover:bg-white/5 transition-all"
             >
@@ -108,8 +108,8 @@ const OtherProjects = () => (
     className="py-16 border-t border-white/5"
   >
     <p className="text-xl text-muted leading-relaxed">
-      Other builds include small-scale tools, games, and smart contracts 
-      exploring different systems and mechanics — including a Python Game, 
+      Other builds include small-scale tools, games, and smart contracts
+      exploring different systems and mechanics — including a Python Game,
       Coin Flip DApp, Mentor Voting DApp, and AutoTyper.
     </p>
   </motion.div>
@@ -124,7 +124,7 @@ const ProjectBlock = ({ project, index, onOpen }) => {
       transition={{ duration: 0.7, ease: "easeOut" }}
       className="min-h-[80vh] flex flex-col justify-center border-t border-white/10"
     >
-      <motion.div 
+      <motion.div
         className="max-w-4xl"
         whileHover={{ scale: 1.01 }}
         transition={{ duration: 0.3 }}
@@ -141,7 +141,7 @@ const ProjectBlock = ({ project, index, onOpen }) => {
         <p className="text-lg md:text-xl text-muted leading-relaxed max-w-2xl mb-12">
           {project.description}
         </p>
-        <button 
+        <button
           onClick={() => onOpen(project)}
           className="inline-flex items-center text-accent hover:text-accent-hover font-medium transition-colors text-lg"
         >
@@ -161,10 +161,10 @@ const Projects = () => {
   return (
     <section id="projects" className="w-full flex flex-col">
       {projectsData.map((project, idx) => (
-        <ProjectBlock 
-          key={project.title} 
-          project={project} 
-          index={idx} 
+        <ProjectBlock
+          key={project.title}
+          project={project}
+          index={idx}
           onOpen={setSelectedProject}
         />
       ))}
@@ -172,9 +172,9 @@ const Projects = () => {
 
       <AnimatePresence>
         {selectedProject && (
-          <ProjectModal 
-            project={selectedProject} 
-            onClose={() => setSelectedProject(null)} 
+          <ProjectModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
           />
         )}
       </AnimatePresence>
