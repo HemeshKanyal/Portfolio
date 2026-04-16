@@ -8,7 +8,7 @@ const projectsData = [
     description: 'A zero-knowledge based system designed to evaluate financial risk profiles while preserving complete user privacy through cryptographic proofs.',
     moreInfo: 'RiskLens leverages advanced ZK-SNARKs to generate proofs of solvency and risk metrics. It allows institutions to verify a user\'s financial health without ever seeing their raw balance or transaction history, effectively solving the privacy-utility trade-off in fintech.',
     github: 'https://github.com/HemeshKanyal/RiskLens',
-    live: '#',
+    live: 'https://risklens.hemeshkanyal.com/',
   },
   {
     title: 'AI OS',
