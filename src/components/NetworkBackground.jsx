@@ -7,7 +7,9 @@ const NetworkBackground = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const dpr = window.devicePixelRatio || 1;
+    
+    // Cap DPR to 2 to prevent 4K retina fill-rate choke
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -22,14 +24,15 @@ const NetworkBackground = () => {
     let sphereCy = height * 0.45;
     let sphereRadius = Math.min(width, height) * 0.32;
 
-    // Counts — ultra dense ~12000 total particles
-    const sphereParticleCount = Math.max(300, Math.min(Math.floor((width * height) / 2000), 500));
-    const ambientParticleCount = Math.max(2000, Math.min(Math.floor((width * height) / 350), 5000));
-    const bgStarCount = Math.max(2000, Math.min(Math.floor((width * height) / 350), 5000));
-    const connectionDistance = width > 768 ? 100 : 70;
+    // Optimized particle counts for 60-120 FPS butter-smooth rendering
+    const sphereParticleCount = Math.max(90, Math.min(Math.floor((width * height) / 8000), 160));
+    const ambientParticleCount = Math.max(100, Math.min(Math.floor((width * height) / 4000), 220));
+    const bgStarCount = Math.max(200, Math.min(Math.floor((width * height) / 3000), 400));
+    const connectionDistance = width > 768 ? 90 : 65;
+    const connectionDistanceSq = connectionDistance * connectionDistance;
 
     let mouse = { x: sphereCx, y: sphereCy, targetX: sphereCx, targetY: sphereCy };
-    let scrollY = 0;
+    let scrollY = window.scrollY;
 
     let sphereParticles = [];
     let ambientParticles = [];
@@ -59,7 +62,6 @@ const NetworkBackground = () => {
     // ─── Ambient particles with gravity distribution ───
     function createAmbientParticle() {
       const angle = Math.random() * Math.PI * 2;
-      // Very strong gravity bias: pow(0.2) heavily clusters near the sphere
       const raw = Math.pow(Math.random(), 0.2);
       const maxDist = Math.max(width, height) * 0.9;
       const minDist = sphereRadius * 1.02;
@@ -71,8 +73,8 @@ const NetworkBackground = () => {
       const y = Math.max(-50, Math.min(height + 50, py));
 
       const proximity = 1 - Math.min((dist - minDist) / (maxDist - minDist), 1);
-      const baseSize = 0.5 + proximity * 3.0 + Math.random() * 1.0;
-      const baseAlpha = 0.1 + proximity * 0.5;
+      const baseSize = 0.5 + proximity * 2.5 + Math.random() * 0.8;
+      const baseAlpha = 0.1 + proximity * 0.45;
 
       return {
         homeX: x, homeY: y, x, y,
@@ -84,17 +86,16 @@ const NetworkBackground = () => {
       };
     }
 
-    // ─── Background stars (uniform, fill entire screen like galaxy dust) ───
+    // ─── Background stars (starfield) ───
     function createBgStar() {
-      // 30% white/silver stars, 70% violet-tinted stars
       const isWhite = Math.random() < 0.3;
       return {
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 2.0 + 0.3,
-        baseAlpha: Math.random() * 0.35 + 0.05,
+        size: Math.random() * 1.8 + 0.3,
+        baseAlpha: Math.random() * 0.3 + 0.05,
         phase: Math.random() * Math.PI * 2,
-        blinkSpeed: 0.3 + Math.random() * 1.5,
+        blinkSpeed: 0.3 + Math.random() * 1.2,
         isWhite,
       };
     }
@@ -103,14 +104,22 @@ const NetworkBackground = () => {
     for (let i = 0; i < ambientParticleCount; i++) ambientParticles.push(createAmbientParticle());
     for (let i = 0; i < bgStarCount; i++) bgStars.push(createBgStar());
 
-    let animationFrameId, smoothMouseFrameId;
+    let animationFrameId;
+    let isTabActive = true;
 
     const animate = (time) => {
+      if (!isTabActive) return;
+
+      // Smooth mouse lerp inside main frame loop
+      mouse.x += (mouse.targetX - mouse.x) * 0.06;
+      mouse.y += (mouse.targetY - mouse.y) * 0.06;
+
       ctx.clearRect(0, 0, width, height);
       const t = time * 0.0003;
 
-      // ─── Background stars (uniform starfield) ───
-      for (const s of bgStars) {
+      // ─── Background stars ───
+      for (let i = 0; i < bgStars.length; i++) {
+        const s = bgStars[i];
         const blink = 0.5 + 0.5 * Math.sin(t * 2 * s.blinkSpeed + s.phase);
         const alpha = s.baseAlpha * blink;
         ctx.beginPath();
@@ -122,92 +131,70 @@ const NetworkBackground = () => {
       }
 
       // ─── Sphere glow halo ───
-      const grad = ctx.createRadialGradient(sphereCx, sphereCy, sphereRadius * 0.2, sphereCx, sphereCy, sphereRadius * 1.6);
-      grad.addColorStop(0, 'rgba(139, 92, 246, 0.07)');
-      grad.addColorStop(0.4, 'rgba(139, 92, 246, 0.03)');
+      const grad = ctx.createRadialGradient(sphereCx, sphereCy, sphereRadius * 0.2, sphereCx, sphereCy, sphereRadius * 1.5);
+      grad.addColorStop(0, 'rgba(139, 92, 246, 0.06)');
+      grad.addColorStop(0.4, 'rgba(139, 92, 246, 0.025)');
       grad.addColorStop(1, 'rgba(139, 92, 246, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, width, height);
 
-      // ─── Ambient particles (interactive, gravity-distributed) ───
-      for (const p of ambientParticles) {
-        // Subtle drift around home position
-        const driftX = Math.sin(t * p.driftSpeed + p.phase) * (6 + p.proximity * 10);
-        const driftY = Math.cos(t * p.driftSpeed * 0.7 + p.phase) * (6 + p.proximity * 10);
+      // ─── Ambient particles ───
+      for (let i = 0; i < ambientParticles.length; i++) {
+        const p = ambientParticles[i];
+        const driftX = Math.sin(t * p.driftSpeed + p.phase) * (5 + p.proximity * 8);
+        const driftY = Math.cos(t * p.driftSpeed * 0.7 + p.phase) * (5 + p.proximity * 8);
 
-        // Mouse interaction: particles push away from cursor
         const dmx = p.homeX + driftX - mouse.x;
         const dmy = p.homeY + driftY - mouse.y;
-        const mouseDist = Math.sqrt(dmx * dmx + dmy * dmy) || 1;
-        const mouseInfluenceRadius = 200;
+        const mouseDistSq = dmx * dmx + dmy * dmy;
+        const mouseRadiusSq = 40000; // 200px ^ 2
         let pushX = 0, pushY = 0;
 
-        if (mouseDist < mouseInfluenceRadius) {
-          const force = (1 - mouseDist / mouseInfluenceRadius) * 30 * p.mouseReactivity;
+        if (mouseDistSq < mouseRadiusSq) {
+          const mouseDist = Math.sqrt(mouseDistSq) || 1;
+          const force = (1 - mouseDist / 200) * 25 * p.mouseReactivity;
           pushX = (dmx / mouseDist) * force;
           pushY = (dmy / mouseDist) * force;
         }
 
-        // Smooth velocity with damping
         p.vx += (pushX - p.vx) * 0.08;
         p.vy += (pushY - p.vy) * 0.08;
 
         p.x = p.homeX + driftX + p.vx;
         p.y = p.homeY + driftY + p.vy;
 
-        // Twinkle effect
         const twinkle = 0.6 + 0.4 * Math.sin(t * 2 * p.driftSpeed + p.phase);
         const alpha = p.baseAlpha * twinkle;
 
-        // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
         ctx.fill();
-
-        // Glow for closer particles
-        if (p.proximity > 0.5) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(139, 92, 246, ${(p.proximity - 0.5) * 0.08 * twinkle})`;
-          ctx.fill();
-        }
       }
 
-      // ─── Sphere particles ───
-      for (let i = 0; i < sphereParticles.length; i++) {
+      // ─── Sphere particles & connections ───
+      const sLen = sphereParticles.length;
+      for (let i = 0; i < sLen; i++) {
         const p = sphereParticles[i];
         const drift = t * p.speed;
         p.x = p.baseX + Math.sin(drift + p.phase) * 8;
         p.y = p.baseY + Math.cos(drift + p.phase * 1.3) * 8;
 
-        // Mouse parallax
-        p.x += (mouse.x - sphereCx) * (p.z / sphereRadius) * 0.12;
-        p.y += (mouse.y - sphereCy) * (p.z / sphereRadius) * 0.12;
-
-        // Scroll parallax
-        p.y -= scrollY * (p.z / sphereRadius) * 0.06;
+        const zRatio = p.z / sphereRadius;
+        p.x += (mouse.x - sphereCx) * zRatio * 0.1;
+        p.y += (mouse.y - sphereCy) * zRatio * 0.1;
+        p.y -= scrollY * zRatio * 0.05;
 
         const depthFactor = (p.z + sphereRadius) / (2 * sphereRadius);
         const actualSize = p.size * (0.5 + depthFactor * 0.7);
         const baseAlpha = p.isShell ? 0.55 : 0.3;
         const alpha = baseAlpha + depthFactor * 0.4;
 
-        // Particle dot
         ctx.beginPath();
         ctx.arc(p.x, p.y, actualSize, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(139, 92, 246, ${alpha})`;
         ctx.fill();
 
-        // Glow on front particles
-        if (depthFactor > 0.55) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, actualSize * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(139, 92, 246, ${(depthFactor - 0.55) * 0.2})`;
-          ctx.fill();
-        }
-
-        // Bright white highlight on closest particles
         if (depthFactor > 0.8 && p.isShell) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, actualSize * 0.6, 0, Math.PI * 2);
@@ -215,18 +202,23 @@ const NetworkBackground = () => {
           ctx.fill();
         }
 
-        // Connections
-        for (let j = i + 1; j < sphereParticles.length; j++) {
-          const dx = p.x - sphereParticles[j].x;
-          const dy = p.y - sphereParticles[j].y;
+        // Optimized connection rendering with max 4 connections per node
+        let connectionCount = 0;
+        for (let j = i + 1; j < sLen; j++) {
+          if (connectionCount >= 4) break;
+          const p2 = sphereParticles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
           const distSq = dx * dx + dy * dy;
-          if (distSq < connectionDistance * connectionDistance) {
+
+          if (distSq < connectionDistanceSq) {
+            connectionCount++;
             const dist = Math.sqrt(distSq);
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(139, 92, 246, ${0.3 * (1 - dist / connectionDistance)})`;
+            ctx.strokeStyle = `rgba(139, 92, 246, ${0.28 * (1 - dist / connectionDistance)})`;
             ctx.lineWidth = 0.6;
             ctx.moveTo(p.x, p.y);
-            ctx.lineTo(sphereParticles[j].x, sphereParticles[j].y);
+            ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
           }
         }
@@ -265,7 +257,6 @@ const NetworkBackground = () => {
         p.isShell = isShell;
       });
 
-      // Redistribute ambient particles with gravity
       const maxDist = Math.max(width, height) * 0.9;
       const minDist = sphereRadius * 1.02;
       ambientParticles.forEach(p => {
@@ -277,12 +268,11 @@ const NetworkBackground = () => {
         const proximity = 1 - Math.min((dist - minDist) / (maxDist - minDist), 1);
         p.homeX = px; p.homeY = py; p.x = px; p.y = py;
         p.proximity = proximity;
-        p.baseAlpha = 0.1 + proximity * 0.5;
-        p.size = 0.3 + proximity * 2.2 + Math.random() * 0.6;
+        p.baseAlpha = 0.1 + proximity * 0.45;
+        p.size = 0.5 + proximity * 2.5 + Math.random() * 0.8;
         p.mouseReactivity = 0.3 + proximity * 0.7;
       });
 
-      // Redistribute background stars
       bgStars.forEach(s => {
         s.x = Math.random() * width;
         s.y = Math.random() * height;
@@ -296,23 +286,25 @@ const NetworkBackground = () => {
 
     const handleScroll = () => { scrollY = window.scrollY; };
 
-    const smoothMouse = () => {
-      mouse.x += (mouse.targetX - mouse.x) * 0.06;
-      mouse.y += (mouse.targetY - mouse.y) * 0.06;
-      smoothMouseFrameId = requestAnimationFrame(smoothMouse);
+    const handleVisibilityChange = () => {
+      isTabActive = !document.hidden;
+      if (isTabActive) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
-    smoothMouseFrameId = requestAnimationFrame(smoothMouse);
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       cancelAnimationFrame(animationFrameId);
-      cancelAnimationFrame(smoothMouseFrameId);
     };
   }, []);
 

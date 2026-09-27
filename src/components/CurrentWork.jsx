@@ -19,7 +19,7 @@ const CurrentWork = () => {
 
   const workItems = [
     "AI Engineering",
-    "Zero-Knowledge Research",
+    "Tokenisation RWAs",
     "Blockchain Development"
   ];
 

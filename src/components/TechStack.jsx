@@ -18,9 +18,9 @@ const TechStack = () => {
   };
 
   const techRows = [
-    "Python · JavaScript · C++ . Solidity",
-    "React · Tailwind · FastAPI . Node.js",
-    "Blockchain · ZK · AI Systems",
+    "Python · JavaScript · Rust · C++ · Solidity",
+    "React · Tailwind · FastAPI · Node.js",
+    "Blockchain · Solana · ZK · AI Systems",
     "Linux · Git · Blender"
   ];
 

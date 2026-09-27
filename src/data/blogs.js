@@ -1,5 +1,98 @@
 export const blogs = [
   {
+    id: 2,
+    title: "What happens when intelligence itself becomes abundant?",
+    slug: "what-happens-when-intelligence-itself-becomes-abundant",
+    date: "September 27, 2026",
+    time: "7:15 PM",
+    excerpt: "A reflection on engineering, education, and the future of human intellectual labour — sparked by a recent classroom discussion and the rapid rise of agentic AI.",
+    content: `I’ve been thinking a lot about what engineering means in the age of AI.
+
+A recent lecture and discussion I watched (linked below) asked a very uncomfortable question:
+If intelligence and thinking become cheap and commoditized, what happens to the value of human intellectual labour?
+
+It made me revisit something I said recently about AI coding.
+
+People often say:
+“You still need engineers because AI can write code, but it can’t do engineering.”
+
+I’m no longer sure that distinction will survive for long.
+
+Today, if I ask an AI to build a payment system, it can already reason about architecture, trust boundaries, idempotency, failure modes, security, scalability, cost, and consistency. More importantly, it can do something humans are fundamentally bad at competing with: 
+
+"iterate"
+
+"Build → test → benchmark → find failure → modify → test again"
+
+Now imagine hundreds or thousands of agents exploring different architectures in parallel, running simulations, attacking their own systems, measuring results, and continuously improving them.
+
+At some point, “AI can’t engineer” stops being a useful argument.
+
+The more interesting question becomes:
+What happens when engineering itself becomes an optimization loop?
+
+Human:
+• define objective
+• define constraints
+
+AI:
+• generates solutions
+• experiments
+• feedback
+• optimization
+• repeat
+
+This also changes what we should learn.
+Maybe the goal isn’t to become the person who can write the most code.
+
+Maybe it is to understand:
+• computer science
+• systems
+• mathematics
+• physics
+• economics
+• security
+• constraints
+• experimentation
+
+…and, most importantly, how to define the right problem.
+
+Because if AI eventually becomes better than us at finding the best solution, the scarce thing may no longer be the solution.
+It may be deciding what should be optimized in the first place.
+
+This also made me think about morphogenesis. Nature often doesn’t explicitly construct every part of an organism. It creates rules, constraints, and feedback mechanisms through which complex structures emerge.
+
+Maybe future engineering moves in a similar direction:
+From building things → designing systems that build themselves.
+
+And then the question becomes much bigger than “Will AI replace programmers?”
+It becomes:
+What is the role of an engineer when intelligence itself becomes abundant?
+
+I recently watched a candid classroom discussion that went even deeper into these questions. The speaker (a professor) was visibly unsettled — talking about civilizational change, agent swarms that start cheating and copying their own weights, the collapse of the old meritocracy based on knowledge, and the very real possibility that universities and traditional education models may not survive in their current form.
+
+He referenced Geoffrey Hinton’s point that in a capitalist society, abundance of intelligence and production does not automatically translate into shared prosperity. It becomes a distribution problem. Greed and jealousy don’t get optimized away.
+
+He also asked the students (and himself) the hardest practical questions:
+• What do we teach when knowledge is free?
+• Why do students still come to a classroom when the best teacher is already on their laptop?
+• What happens to intellectual labour when it is no longer scarce?
+• What does an economy look like when thinking is cheap?
+
+These are not comfortable questions. But they feel necessary.
+
+The full discussion is here:
+https://youtu.be/N2a1J0UPeL4
+
+I’m still sitting with all of this.
+
+I don’t have clean answers yet.
+
+But I keep coming back to the same shift:
+The scarce resource is moving from finding solutions to deciding what is worth solving and designing the systems, constraints, and values that will shape whatever emerges next.`,
+    image: "https://img.youtube.com/vi/N2a1J0UPeL4/maxresdefault.jpg",
+  },
+  {
     id: 1,
     title: "Will Work Become Optional? A Thought on Elon, Energy, Evolution, and Human Nature",
     slug: "will-work-become-optional-elon-musk-nikhil-kamath",
