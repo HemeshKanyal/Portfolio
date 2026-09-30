@@ -4,11 +4,22 @@
 
 @layer base {
   body {
-    @apply bg-background text-foreground antialiased selection:bg-accent/30 selection:text-white cursor-none;
+    @apply bg-background text-foreground antialiased selection:bg-accent selection:text-background;
   }
-  
-  a, button, [role="button"], input, textarea, select {
-    @apply cursor-none;
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+
+  /* The custom cursor replaces the native one only on mouse/trackpad devices */
+  @media (pointer: fine) {
+    body, a, button, [role="button"], input, textarea, select {
+      cursor: none;
+    }
+  }
+
+  :focus-visible {
+    @apply outline outline-2 outline-offset-4 outline-accent rounded-sm;
   }
 }
 
@@ -22,5 +33,26 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-all;
+  @apply bg-foreground/10 rounded-full hover:bg-foreground/20 transition-all;
+}
+
+@layer utilities {
+  /* Hollow display type */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(236 232 223 / 0.35);
+  }
+  .text-outline-accent {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgb(242 196 109 / 0.9);
+  }
+  .text-outline-faint {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(236 232 223 / 0.08);
+  }
+  /* Break out of the centred content column to the full viewport width */
+  .full-bleed {
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+  }
 }

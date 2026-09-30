@@ -24,14 +24,14 @@ const CurrentWork = () => {
   ];
 
   return (
-    <section className="min-h-[60vh] flex flex-col justify-center py-20">
+    <section data-shape="fractions" className="min-h-[60vh] flex flex-col justify-center py-20">
       <motion.div
         variants={container}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.3 }}
       >
-        <motion.h4 variants={item} className="text-xl md:text-2xl text-accent-blue mb-12 font-medium tracking-wide">
+        <motion.h4 variants={item} className="text-xl md:text-2xl text-accent mb-12 font-medium tracking-wide">
           CURRENT WORK
         </motion.h4>
         
@@ -42,8 +42,8 @@ const CurrentWork = () => {
               variants={item}
               className="group flex flex-col md:flex-row md:items-center cursor-default"
             >
-              <div className="hidden md:block w-8 h-[2px] bg-white/20 mr-8 group-hover:w-16 group-hover:bg-accent transition-all duration-300"></div>
-              <span className="text-3xl md:text-5xl font-bold text-white tracking-tight group-hover:text-accent transition-colors">
+              <div className="hidden md:block w-8 h-[2px] bg-foreground/20 mr-8 group-hover:w-16 group-hover:bg-accent transition-all duration-300"></div>
+              <span className="text-3xl md:text-5xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors">
                 {work}
               </span>
             </motion.li>

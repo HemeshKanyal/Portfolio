@@ -56,7 +56,7 @@ const renderFormattedContent = (content) => {
   return blocks.map((block, index) => {
     if (block.type === 'youtube') {
       return (
-        <div key={index} className="my-8 overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black/60 backdrop-blur-md">
+        <div key={index} className="my-8 overflow-hidden rounded-2xl border border-foreground/10 shadow-2xl bg-black/60 backdrop-blur-md">
           <div className="relative aspect-video w-full">
             <iframe
               src={`https://www.youtube.com/embed/${block.videoId}`}
@@ -66,8 +66,8 @@ const renderFormattedContent = (content) => {
               className="w-full h-full border-0"
             />
           </div>
-          <div className="p-4 bg-white/5 border-t border-white/10 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-white/80">
+          <div className="p-4 bg-foreground/5 border-t border-foreground/10 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2 text-sm font-medium text-foreground/80">
               <Play size={16} className="text-accent fill-accent" />
               <span>Watch full discussion video</span>
             </div>
@@ -75,7 +75,7 @@ const renderFormattedContent = (content) => {
               href={block.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs font-semibold px-4 py-2 rounded-full bg-accent text-white hover:bg-accent/80 transition-colors flex items-center gap-1.5 shadow-lg shadow-accent/20"
+              className="text-xs font-semibold px-4 py-2 rounded-full bg-accent text-foreground hover:bg-accent/80 transition-colors flex items-center gap-1.5 shadow-lg shadow-accent/20"
             >
               Open on YouTube <ExternalLink size={12} />
             </a>
@@ -86,7 +86,7 @@ const renderFormattedContent = (content) => {
 
     if (block.type === 'quote') {
       return (
-        <blockquote key={index} className="my-6 pl-6 border-l-4 border-accent text-white/90 text-xl font-medium italic bg-accent/5 py-4 px-6 rounded-r-2xl border-y border-r border-white/5">
+        <blockquote key={index} className="my-6 pl-6 border-l-4 border-accent text-foreground/90 text-xl font-medium italic bg-accent/5 py-4 px-6 rounded-r-2xl border-y border-r border-foreground/5">
           {block.text}
         </blockquote>
       );
@@ -147,26 +147,26 @@ const BlogModal = ({ blog, onClose }) => {
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-4xl bg-[#0f0f0f] border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="relative w-full max-w-4xl bg-surface border border-foreground/10 rounded-[2.5rem] shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Action Buttons */}
         <div className="absolute top-6 right-6 z-20 flex gap-3">
           <button 
             onClick={handleShare}
-            className="p-2.5 rounded-full bg-black/40 border border-white/10 text-white/70 hover:text-white hover:bg-black/60 transition-all backdrop-blur-md group relative"
+            className="p-2.5 rounded-full bg-black/40 border border-foreground/10 text-foreground/70 hover:text-foreground hover:bg-black/60 transition-all backdrop-blur-md group relative"
             title="Copy link"
           >
             {copied ? <Check size={20} className="text-green-400" /> : <Share2 size={20} />}
             {copied && (
-              <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-accent text-white text-xs font-bold rounded-lg shadow-xl whitespace-nowrap">
+              <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1 bg-accent text-foreground text-xs font-bold rounded-lg shadow-xl whitespace-nowrap">
                 Link Copied!
               </span>
             )}
           </button>
           <button 
             onClick={onClose}
-            className="p-2.5 rounded-full bg-black/40 border border-white/10 text-white/70 hover:text-white hover:bg-black/60 transition-all backdrop-blur-md group"
+            className="p-2.5 rounded-full bg-black/40 border border-foreground/10 text-foreground/70 hover:text-foreground hover:bg-black/60 transition-all backdrop-blur-md group"
           >
             <X size={20} className="transition-transform group-hover:rotate-90" />
           </button>
@@ -181,7 +181,7 @@ const BlogModal = ({ blog, onClose }) => {
               alt={blog.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] via-[#0f0f0f]/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/20 to-transparent" />
           </div>
 
           <div className="p-8 md:p-14 -mt-20 relative z-10">
@@ -197,7 +197,7 @@ const BlogModal = ({ blog, onClose }) => {
               </div>
             </div>
 
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-8 tracking-tight leading-tight">
+            <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 tracking-tight leading-tight">
               {blog.title}
             </h2>
 

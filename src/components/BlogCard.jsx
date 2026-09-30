@@ -7,7 +7,7 @@ const BlogCard = ({ blog, onOpen }) => {
     <motion.div
       whileHover={{ y: -8 }}
       onClick={() => onOpen(blog)}
-      className="group relative bg-[#121212] border border-white/5 rounded-3xl overflow-hidden hover:border-accent/30 transition-all duration-500 shadow-2xl shadow-black/50 cursor-pointer"
+      className="group relative bg-surface border border-foreground/5 rounded-3xl overflow-hidden hover:border-accent/30 transition-all duration-500 shadow-2xl shadow-black/50 cursor-pointer"
     >
       {/* Image Container */}
       <div className="relative h-64 overflow-hidden">
@@ -16,7 +16,7 @@ const BlogCard = ({ blog, onOpen }) => {
           alt={blog.title}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent opacity-60" />
       </div>
 
       {/* Content */}
@@ -32,7 +32,7 @@ const BlogCard = ({ blog, onOpen }) => {
           </div>
         </div>
 
-        <h3 className="text-2xl font-bold text-white mb-4 group-hover:text-accent transition-colors duration-300">
+        <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-accent transition-colors duration-300">
           {blog.title}
         </h3>
 

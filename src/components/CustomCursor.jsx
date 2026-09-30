@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 const CustomCursor = () => {
-  const [isPointerDevice, setIsPointerDevice] = useState(false);
+  const [isPointerDevice, setIsPointerDevice] = useState(() => window.matchMedia('(pointer: fine)').matches);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   
@@ -17,7 +17,6 @@ const CustomCursor = () => {
   useEffect(() => {
     // Only enable custom cursor on fine pointer devices (mouse/trackpad), bypass on touch screens
     const mediaQuery = window.matchMedia('(pointer: fine)');
-    setIsPointerDevice(mediaQuery.matches);
 
     const handleMediaChange = (e) => setIsPointerDevice(e.matches);
     mediaQuery.addEventListener('change', handleMediaChange);
@@ -33,11 +32,9 @@ const CustomCursor = () => {
       const target = e.target;
       if (!target) return;
 
-      const tagName = target.tagName;
-      const isText = tagName === 'P' || tagName === 'H1' || tagName === 'H2' || tagName === 'H3' || tagName === 'SPAN' || tagName === 'A';
-      const isInteractive = tagName === 'BUTTON' || tagName === 'A' || tagName === 'INPUT' || target.closest('button') || target.closest('a');
-      
-      setIsHovering(Boolean(isText || isInteractive));
+      // Grow (and invert what's underneath) only over things worth pointing at:
+      // links, buttons and large headings — not every paragraph on the page.
+      setIsHovering(Boolean(target.closest('a, button, input, textarea, [role="button"], h1, h2, h3')));
     };
 
     const handleMouseDown = () => setIsClicked(true);
@@ -62,14 +59,14 @@ const CustomCursor = () => {
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-difference bg-white will-change-transform"
+        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9999] mix-blend-difference bg-foreground will-change-transform"
         style={{
           left: cursorX,
           top: cursorY,
           translateX: '-50%',
           translateY: '-50%',
-          width: isHovering ? 80 : 18,
-          height: isHovering ? 80 : 18,
+          width: isHovering ? 64 : 14,
+          height: isHovering ? 64 : 14,
           scale: isClicked ? 0.9 : 1,
         }}
         transition={{
@@ -84,7 +81,7 @@ const CustomCursor = () => {
       
       {!isHovering && (
         <motion.div
-          className="fixed top-0 left-0 w-8 h-8 border border-white/20 rounded-full pointer-events-none z-[9998] will-change-transform"
+          className="fixed top-0 left-0 w-8 h-8 border border-foreground/20 rounded-full pointer-events-none z-[9998] will-change-transform"
           style={{
             left: cursorX,
             top: cursorY,

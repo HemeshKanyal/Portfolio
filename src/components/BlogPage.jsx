@@ -1,33 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { blogs } from '../data/blogs';
 import BlogCard from './BlogCard';
 import BlogModal from './BlogModal';
-import NetworkBackground from './NetworkBackground';
-import CustomCursor from './CustomCursor';
 
 const BlogPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  const [selectedBlog, setSelectedBlog] = useState(null);
+  const selectedBlog = slug ? blogs.find(b => b.slug === slug) ?? null : null;
 
   // Sorting blogs to show newest at top by date
   const sortedBlogs = [...blogs].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   useEffect(() => {
-    if (slug) {
-      const blog = blogs.find(b => b.slug === slug);
-      if (blog) {
-        setSelectedBlog(blog);
-      } else {
-        navigate('/blog');
-      }
-    } else {
-      setSelectedBlog(null);
-    }
-  }, [slug, navigate]);
+    if (slug && !selectedBlog) navigate('/blog');
+  }, [slug, selectedBlog, navigate]);
 
   useEffect(() => {
     if (!slug) {
@@ -44,13 +33,10 @@ const BlogPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-background font-sans text-foreground overflow-x-hidden">
-      <CustomCursor />
-      <NetworkBackground />
-      
+    <div className="relative min-h-screen w-full">
       <main className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-12 py-20 flex flex-col">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-white/5 pb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-foreground/5 pb-12">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -70,7 +56,7 @@ const BlogPage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2 }}
-              className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6"
+              className="text-5xl md:text-7xl font-bold tracking-tight text-foreground mb-6"
             >
               The <span className="text-accent">Journal</span>
             </motion.h1>
@@ -91,7 +77,7 @@ const BlogPage = () => {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="hidden lg:block"
           >
-            <div className="px-6 py-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-sm font-medium text-muted">
+            <div className="px-6 py-3 rounded-full border border-foreground/10 bg-foreground/5 backdrop-blur-md text-sm font-medium text-muted">
               {blogs.length} Articles Published
             </div>
           </motion.div>
