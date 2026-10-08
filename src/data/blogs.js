@@ -1,5 +1,140 @@
 export const blogs = [
   {
+    id: 3,
+    title: "India, GIFT City and Dubai: What's Live in Tokenisation and What Still Needs Building",
+    slug: "india-gift-city-dubai-tokenisation",
+    date: "October 8, 2026",
+    time: "10:09 PM",
+    excerpt: "A map of what SEBI, RBI, IFSCA, VARA, the Dubai Land Department, DFSA and ADGM actually allow today for tokenised real-world assets, and six problems nobody has solved yet.",
+    content: `In September 2026, India issued its first tokenised corporate bonds: ₹1,025 crore from REC, Larsen & Toubro and IIFL Finance, settled in wholesale digital rupees. It was a real milestone, and most coverage stopped at the headline.
+
+I'm building infrastructure for tokenised real-world assets, starting in India and the UAE. So I spent the last few weeks reading what SEBI, RBI, IFSCA, VARA, the Dubai Land Department, DFSA and ADGM actually allow today.
+
+This post is the map I wish I'd had at the start: what is live in each place, what is still blocked, and six problems that nobody has solved yet. It's research, not legal or tax advice, and it reflects the rules as of 8 October 2026.
+
+## Three places, three very different stages
+
+The short version: Dubai is furthest ahead on real estate, India has the cleanest settlement, and GIFT City is still waiting on final rules.
+
+• **India (SEBI and RBI)** has a live pilot, but only for corporate bonds. Demat 2.0 went live in September 2026 on a ledger run by the depositories.
+• **GIFT City (IFSCA)** has sandbox approvals but no final rules. A consultation came out in February 2025 and a new FinTech sandbox framework in March 2026. There is still no licence category for issuing tokens.
+• **Dubai (VARA and the Dubai Land Department)** is the furthest ahead on property. Tokenised property has had controlled resale since February 2026, and VARA's April 2026 guidance says issuers of RWA-backed tokens must be licensed.
+
+## India's Demat 2.0: how a tokenised bond moves today
+
+Demat 2.0 is a SEBI pilot run in its regulatory sandbox, together with RBI. Here is the path a bond takes:
+
+1. **Issue.** The bond is issued on the stock exchange's Electronic Bidding Platform, like any other corporate bond.
+2. **Record.** NSDL and CDSL record it on a private, permissioned ledger they own. For now, only the depositories and exchanges run nodes.
+3. **Settle.** The bond and the money move together. The cash leg uses RBI's wholesale e-rupee, so either both sides settle or neither does (atomic delivery-versus-payment).
+4. **Service.** The bond's terms sit in a smart contract, and coupons and redemption are paid into investors' e-rupee wallets.
+
+**What changed:** settlement is real-time instead of T+1, and reconciliation between two separate systems disappears. Investors don't need a crypto wallet, because the depository holds the keys.
+
+**What didn't change:** a tokenised bond is still a bond. It keeps the same ISIN, coupon, maturity and issuer credit risk. A tokenised L&T bond is still an L&T bond. Tokenisation changes the plumbing, not the asset.
+
+## What India still doesn't allow
+
+Phase one of Demat 2.0 proves the settlement works. It doesn't yet create a market.
+
+| Restriction | Why it matters |
+| --- | --- |
+| No exchange or RFQ trading | Holders can only trade off-market through the depository or exchange. There is no real secondary market yet. |
+| Institutions only | Retail access is planned for a later stage. Individuals can't buy in. |
+| No fractions | The minimum lot is still one bond. Fractional ownership hasn't been permitted or clarified. |
+| No conversion | A token can't be turned back into a conventional bond, or the other way round. |
+| Closed network | Only depositories and exchanges run nodes. Other regulated entities may join later. |
+| One asset class | Corporate bonds only. No funds, gold, real estate or government securities. |
+
+Outside the pilot, the picture is thinner still:
+
+• **Fractional real estate** was pulled under SEBI's Small and Medium REIT rules in 2024, with a minimum investment of ₹10 lakh. That is a long way from "own a slice for ₹1,000".
+• **Crypto-style tokens** that sit outside the demat system risk being treated as virtual digital assets. That means a flat 30% tax plus cess, 1% TDS on transfers, and no setting off losses.
+• **Gold, funds and other securities** have no general tokenisation framework in the domestic market. Today, the Demat 2.0 sandbox is the only on-ramp.
+
+## GIFT City: the door is open a crack
+
+GIFT City is where India is most likely to allow tokenised assets at scale, but the final rules aren't out yet.
+
+**What's possible today:**
+
+• Register as a tokenisation technology provider under IFSCA's 2025 TechFin rules.
+• Test a product in the FinTech Sandbox, whose framework was issued in March 2026, under a limited-use authorisation.
+• Two real-estate token platforms already have conditional sandbox approval.
+
+**What's still missing:**
+
+• Final RWA tokenisation rules. The February 2025 consultation paper asked questions but proposed no specific rules.
+• Any licence to issue tokens, run a platform or manage pooled assets.
+• A tech registration can't solicit investors or issue products, and its clients must be non-residents.
+
+For a startup, that means you can build the technology in GIFT City today, but you can't be the one offering the product.
+
+## Dubai and the UAE: clear rules, but a licence comes first
+
+The UAE has the clearest rules of the three, but almost every route starts with a licence.
+
+**Dubai mainland (VARA and the Dubai Land Department):**
+
+• **RWA tokens are Category 1.** VARA's issuance guidance from April 2026 says issuers of asset-referenced tokens must be licensed. They must publish a whitepaper and a separate risk statement, and meet rules on reserves, custody and redemption.
+• **Property tokens can be resold.** In February 2026 the Dubai Land Department opened phase II of its tokenisation project, allowing resale of about 7.8 million property tokens. Trading happens only on approved platforms, inside a controlled pilot.
+• **Big players are moving in.** In September 2026, VARA signed a partnership with Securitize to support regulated tokenisation and bring in institutions.
+
+**The financial free zones (DIFC and ADGM):**
+
+• **DIFC's regulator, the DFSA, runs a tokenisation sandbox.** Firms can test issuing, trading, holding and settling tokenised equities, bonds, sukuk and fund units under an Innovation Testing Licence. 96 firms expressed interest, and crypto tokens are out of scope.
+• **ADGM's FSRA regulates a token that represents a share, bond or fund unit as that security.** It carries the same prospectus, licensing and custody rules, just on a different ledger.
+
+For a builder, the free zones are the cleanest home for tokenised securities. Dubai mainland under VARA is the home for property and other asset-referenced tokens.
+
+## India vs GIFT City vs Dubai
+
+|  | India (SEBI + RBI) | GIFT City (IFSCA) | Dubai (VARA + DLD) |
+| --- | --- | --- | --- |
+| Status | Pilot live since Sep 2026 | Sandbox only, final rules pending | Property pilot with resale |
+| Assets | Corporate bonds | Real estate, in the sandbox | Property and RWA-backed tokens |
+| Who can invest | Institutions only | Non-residents; Indian residents via LRS | Set by licensed platforms |
+| Secondary trading | Off-market only | Not defined yet | Approved platforms only |
+| Route for a startup | Partner with regulated players | Tech registration or sandbox | VARA licence or a licensed partner |
+| Biggest gap | Liquidity, retail access, fractions | No licence to issue | Licensing cost, closed platforms |
+
+## Six problems nobody has solved yet
+
+Each jurisdiction has solved part of the puzzle. These are the gaps between the pieces, and each one is an opening for builders.
+
+• **Liquidity.** India's tokenised bonds can't trade on an exchange yet, and Dubai's property tokens resell only on approved platforms. A token you can't sell is just a slower bond.
+• **Closed ledgers.** The depository network, the Dubai Land Department's platforms and GIFT City's sandboxes are separate systems that don't talk to each other.
+• **The cash leg.** India settles in wholesale e-rupee. Nothing settles INR against AED or USD on-chain across the border.
+• **Portable identity.** KYC done in India isn't reusable in Dubai. Every platform verifies the same investor again from scratch.
+• **Small tickets.** One whole bond, institutions only, and ₹10 lakh for SM REITs. Owning a small slice of an asset isn't possible in India yet.
+• **Legal and tax clarity.** GIFT City's final rules aren't out, and a token outside the demat system risks India's 30% VDA tax with no loss set-off.
+
+The India–UAE corridor shows the gap clearly. An Indian investor wanting a Dubai property token faces unclear rules on sending money abroad, a fresh KYC, and possible VDA tax at home. A UAE investor wanting an Indian tokenised bond can't get in at all, because Demat 2.0 is open to eligible institutions only. Whoever connects these two rulebooks builds the rail.
+
+## What this means for builders
+
+The regulators have done the hard, boring work first: legal recognition and a real cash leg. What's missing now is the connective tissue between markets, which is exactly the kind of infrastructure startups can build.
+
+I'm working on that layer, and I'll keep sharing what I learn as I go. If you work in capital markets, law or a bank, I'd like to hear from you. Which of these six problems would you solve first? You can reach me on X or LinkedIn.
+
+This post is research for discussion, not legal, tax or investment advice. Rules are changing quickly, so check the primary sources before acting on anything here.
+
+## Sources
+
+• India set to tokenise corporate bonds, Vinod Kothari Consultants, September 2026 (summarising SEBI's Demat 2.0 FAQs of 10 September 2026)
+• India starts tokenizing $620B corporate bond market with digital rupee settlement, CoinDesk, 11 September 2026
+• L&T becomes India's first private-sector corporate to issue a tokenised bond, Larsen & Toubro, 9 September 2026
+• India's first tokenized corporate bonds go live, The Crypto Times, 10 September 2026
+• Tokenising real-world assets in GIFT IFSC: what the regulatory perimeter actually allows, PKM Advisory, August 2026
+• VARA issues detailed guidance on virtual asset issuance, Hadef & Partners, 16 April 2026
+• Dubai Land Department launches phase II of the real estate tokenisation project, Dubai Land Department, 9 February 2026
+• Securitize signs deal with Dubai VARA to advance tokenisation, FOW, 4 September 2026
+• Tokenisation Regulatory Sandbox, DFSA
+• DFSA's inaugural Tokenisation Regulatory Sandbox attracts interest from 96 firms, WAM
+• Crypto VDA taxation under the Income Tax Act 2025, Patron Accounting, April 2026`,
+    image: "https://images.unsplash.com/photo-1605792657660-596af9009e82?w=1600&h=800&fit=crop&crop=bottom&q=80",
+  },
+  {
     id: 2,
     title: "What happens when intelligence itself becomes abundant?",
     slug: "what-happens-when-intelligence-itself-becomes-abundant",

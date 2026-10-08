@@ -2,12 +2,23 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, X, Share2, Check, ExternalLink, Play } from 'lucide-react';
 
+// Renders **bold** spans inside a line of text
+const renderInline = (text) =>
+  text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith('**') && part.endsWith('**')
+      ? <strong key={i} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
+      : part
+  );
+
+const parseTableRow = (line) => line.replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim());
+
 const renderFormattedContent = (content) => {
   if (!content) return null;
 
   const lines = content.split('\n');
   const blocks = [];
   let currentParagraph = [];
+  let currentTable = null;
 
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
@@ -16,10 +27,40 @@ const renderFormattedContent = (content) => {
     }
   };
 
+  const flushTable = () => {
+    if (currentTable) {
+      const [header, ...rows] = currentTable.filter((row) => !row.every((cell) => /^-+$/.test(cell)));
+      blocks.push({ type: 'table', header, rows });
+      currentTable = null;
+    }
+  };
+
   lines.forEach((line) => {
     const trimmed = line.trim();
+
+    if (trimmed.startsWith('|')) {
+      flushParagraph();
+      currentTable = currentTable ?? [];
+      currentTable.push(parseTableRow(trimmed));
+      return;
+    }
+    flushTable();
+
     if (!trimmed) {
       flushParagraph();
+      return;
+    }
+
+    if (trimmed.startsWith('## ')) {
+      flushParagraph();
+      blocks.push({ type: 'heading', text: trimmed.slice(3) });
+      return;
+    }
+
+    const numberedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+    if (numberedMatch) {
+      flushParagraph();
+      blocks.push({ type: 'numbered_item', number: numberedMatch[1], text: numberedMatch[2] });
       return;
     }
 
@@ -52,6 +93,7 @@ const renderFormattedContent = (content) => {
   });
 
   flushParagraph();
+  flushTable();
 
   return blocks.map((block, index) => {
     if (block.type === 'youtube') {
@@ -101,6 +143,54 @@ const renderFormattedContent = (content) => {
       );
     }
 
+    if (block.type === 'heading') {
+      return (
+        <h3 key={index} className="text-2xl md:text-3xl font-bold text-foreground tracking-tight mt-12 mb-5">
+          {block.text}
+        </h3>
+      );
+    }
+
+    if (block.type === 'numbered_item') {
+      return (
+        <div key={index} className="flex items-start gap-3 my-3 pl-2">
+          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-accent/10 border border-accent/30 text-accent text-sm font-bold flex items-center justify-center mt-0.5">
+            {block.number}
+          </span>
+          <span className="text-base text-foreground/90 leading-relaxed">
+            {renderInline(block.text)}
+          </span>
+        </div>
+      );
+    }
+
+    if (block.type === 'table') {
+      return (
+        <div key={index} className="my-8 overflow-x-auto rounded-2xl border border-foreground/10">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-accent/10 text-accent">
+              <tr>
+                {block.header.map((cell, i) => (
+                  <th key={i} className="px-4 py-3 font-semibold whitespace-nowrap">{cell}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, r) => (
+                <tr key={r} className="border-t border-foreground/5">
+                  {row.map((cell, i) => (
+                    <td key={i} className={`px-4 py-3 align-top leading-relaxed ${i === 0 ? 'font-semibold text-foreground' : 'text-foreground/80'}`}>
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+
     if (block.type === 'list_item') {
       return (
         <div key={index} className="flex items-start gap-3 my-2 pl-2 text-foreground/90 font-medium">
@@ -108,7 +198,7 @@ const renderFormattedContent = (content) => {
             {block.text.startsWith('→') ? '→' : '•'}
           </span>
           <span className="text-base text-foreground/90 leading-relaxed">
-            {block.text.replace(/^[•\->]\s*/, '')}
+            {renderInline(block.text.replace(/^[•\->]\s*/, ''))}
           </span>
         </div>
       );
@@ -116,7 +206,7 @@ const renderFormattedContent = (content) => {
 
     return (
       <p key={index} className="text-lg text-muted leading-relaxed mb-6 font-normal">
-        {block.text}
+        {renderInline(block.text)}
       </p>
     );
   });
