@@ -12,6 +12,9 @@ import Philosophy from './components/Philosophy';
 import CurrentWork from './components/CurrentWork';
 import TechStack from './components/TechStack';
 import Contact from './components/Contact';
+import EventHorizon from './components/EventHorizon';
+import GravityEgg from './components/GravityEgg';
+import SoundToggle from './components/SoundToggle';
 import BlogPage from './components/BlogPage';
 
 const Home = () => (
@@ -23,13 +26,14 @@ const Home = () => (
     <Philosophy />
     <CurrentWork />
     <TechStack />
+    <EventHorizon />
     <Contact />
   </main>
 );
 
 function App() {
   return (
-    <div className="relative min-h-screen w-full bg-background font-sans text-foreground overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-background font-sans text-foreground overflow-x-clip">
       <CustomCursor />
       <CosmosBackground />
 
@@ -38,11 +42,21 @@ function App() {
           <>
             <BlogButton />
             <SideNav />
+            <GravityEgg />
             <Home />
           </>
         } />
-        <Route path="/blog" element={<BlogPage />} />
-        <Route path="/blog/:slug" element={<BlogPage />} />
+        <Route path="/blog/*" element={
+          <>
+            <div className="fixed top-6 right-6 md:top-8 md:right-8 z-50">
+              <SoundToggle />
+            </div>
+            <Routes>
+              <Route index element={<BlogPage />} />
+              <Route path=":slug" element={<BlogPage />} />
+            </Routes>
+          </>
+        } />
       </Routes>
     </div>
   );

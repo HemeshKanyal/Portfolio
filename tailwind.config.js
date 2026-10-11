@@ -30,11 +30,16 @@ export default {
           from: { transform: 'translateY(-100%)' },
           to: { transform: 'translateY(200%)' },
         },
+        eq: {
+          '0%, 100%': { transform: 'scaleY(0.35)' },
+          '50%': { transform: 'scaleY(1)' },
+        },
       },
       animation: {
         marquee: 'marquee 40s linear infinite',
         'marquee-reverse': 'marquee 48s linear infinite reverse',
         'scroll-cue': 'scroll-cue 1.8s ease-in-out infinite',
+        eq: 'eq 1.1s ease-in-out infinite',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

@@ -17,10 +17,11 @@ const CurrentWork = () => {
     show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
+  // What's actually in progress, from the repos' recent work
   const workItems = [
-    "AI Engineering",
-    "Tokenisation RWAs",
-    "Blockchain Development"
+    ['Shipping ASCENT', 'Android app and web app from one Expo codebase'],
+    ['RiskLens', 'Crisis stress tests and in-browser ZK identity'],
+    ['BharatRWA on Solana', 'ERC-7943 compliance mapped onto Token-2022'],
   ];
 
   return (
@@ -36,15 +37,18 @@ const CurrentWork = () => {
         </motion.h4>
         
         <ul className="flex flex-col gap-10 md:gap-14">
-          {workItems.map((work) => (
+          {workItems.map(([work, detail]) => (
             <motion.li 
               key={work} 
               variants={item}
               className="group flex flex-col md:flex-row md:items-center cursor-default"
             >
               <div className="hidden md:block w-8 h-[2px] bg-foreground/20 mr-8 group-hover:w-16 group-hover:bg-accent transition-all duration-300"></div>
-              <span className="text-3xl md:text-5xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors">
-                {work}
+              <span>
+                <span className="block text-3xl md:text-5xl font-bold text-foreground tracking-tight group-hover:text-accent transition-colors">
+                  {work}
+                </span>
+                <span className="block mt-2 font-mono text-sm text-muted">{detail}</span>
               </span>
             </motion.li>
           ))}

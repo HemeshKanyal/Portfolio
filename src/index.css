@@ -23,6 +23,32 @@
   }
 }
 
+/* Page transitions driven by the cosmos (see three/cosmos.js). The background layer is
+   aria-hidden; everything else is UI that gets pulled into the effect. Transitions live only on the
+   active states, so framer-motion's per-frame styles (cursor, entrances) are never smoothed. */
+
+/* Wormhole: the page rushes past the camera */
+html.warping #root > div > :not([aria-hidden="true"]) {
+  opacity: 0;
+  filter: blur(6px);
+  transition: opacity 0.6s ease-in, filter 0.6s ease-in;
+}
+html.warping main {
+  transform: scale(1.35);
+  transition: opacity 0.6s ease-in, filter 0.6s ease-in, transform 0.95s cubic-bezier(0.55, 0, 0.9, 0.4);
+}
+
+/* Big Crunch: everything on screen spirals into the singularity */
+html.crunching #root > div > :not([aria-hidden="true"]) {
+  opacity: 0;
+  filter: blur(8px);
+  transition: opacity 1.2s ease-in, filter 1.2s ease-in;
+}
+html.crunching main {
+  transform-origin: 50% var(--crunch-y, 50%);
+  transform: scale(0.02) rotate(40deg);
+  transition: opacity 1.2s ease-in, filter 1.2s ease-in, transform 1.5s cubic-bezier(0.6, 0, 0.95, 0.35);
+}
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

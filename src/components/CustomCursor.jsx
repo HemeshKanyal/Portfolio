@@ -5,6 +5,8 @@ const CustomCursor = () => {
   const [isPointerDevice, setIsPointerDevice] = useState(() => window.matchMedia('(pointer: fine)').matches);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+  // While the background is a black hole, the hole itself is the cursor
+  const [isHole, setIsHole] = useState(false);
   
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
@@ -22,6 +24,9 @@ const CustomCursor = () => {
     mediaQuery.addEventListener('change', handleMediaChange);
 
     if (!mediaQuery.matches) return;
+
+    const handleHole = (e) => setIsHole(e.detail);
+    window.addEventListener('cosmos:hole', handleHole);
 
     const handleMouseMove = (e) => {
       mouseX.set(e.clientX);
@@ -47,6 +52,7 @@ const CustomCursor = () => {
 
     return () => {
       mediaQuery.removeEventListener('change', handleMediaChange);
+      window.removeEventListener('cosmos:hole', handleHole);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
       window.removeEventListener('mousedown', handleMouseDown);
@@ -67,7 +73,7 @@ const CustomCursor = () => {
           translateY: '-50%',
           width: isHovering ? 64 : 14,
           height: isHovering ? 64 : 14,
-          scale: isClicked ? 0.9 : 1,
+          scale: isHole ? 0 : isClicked ? 0.9 : 1,
         }}
         transition={{
           type: 'spring',
@@ -79,7 +85,7 @@ const CustomCursor = () => {
         }}
       />
       
-      {!isHovering && (
+      {!isHovering && !isHole && (
         <motion.div
           className="fixed top-0 left-0 w-8 h-8 border border-foreground/20 rounded-full pointer-events-none z-[9998] will-change-transform"
           style={{

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 // Sits directly on the cosmos: the galaxy shape swirls behind this text
 const Philosophy = () => {
   return (
-    <section data-shape="galaxy" className="full-bleed relative overflow-hidden">
+    <section data-shape="galaxy" data-grid className="full-bleed relative overflow-hidden">
       <span
         aria-hidden="true"
         className="absolute -right-8 -bottom-16 md:-bottom-24 font-display font-bold leading-none text-[40vw] md:text-[24rem] text-outline-faint select-none pointer-events-none"

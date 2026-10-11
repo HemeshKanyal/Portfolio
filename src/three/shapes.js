@@ -246,7 +246,81 @@ function galaxy(count) {
   return out;
 }
 
-export const SHAPES = { planet, neural, chain, systems, shield, fractions, route, galaxy };
+// ─── Black hole, Interstellar style ───
+// A thin accretion disk seen almost edge-on, plus the lensed image of its far side
+// arching over and under the shadow. The shadow itself is drawn by the backdrop.
+// The disk keeps |y| small and starts outside the ring, which is how the shader finds it to spin it.
+function blackhole(count) {
+  const out = new Float32Array(count * 3);
+  const diskShare = Math.floor(count * 0.58);
+  const ringShare = Math.floor(count * 0.34);
+  for (let i = 0; i < count; i++) {
+    if (i < diskShare) {
+      // Denser toward the inner edge
+      const r = 1.75 + Math.pow(Math.random(), 2.2) * 1.7;
+      const a = Math.random() * TAU;
+      put(out, i, Math.cos(a) * r, gauss(0.018 + (r - 1.75) * 0.012), Math.sin(a) * r);
+    } else if (i < diskShare + ringShare) {
+      // Lensed far side of the disk: a bright ring hugging the shadow, thicker top and bottom
+      const a = Math.random() * TAU;
+      const r = 1.18 + Math.abs(gauss(0.07)) + Math.pow(Math.abs(Math.sin(a)), 3) * rand(0, 0.28);
+      put(out, i, Math.cos(a) * r, Math.sin(a) * r * 0.96, gauss(0.03));
+    } else {
+      // Faint glow of infalling gas
+      const a = Math.random() * TAU;
+      const r = rand(1.2, 4.2);
+      put(out, i, Math.cos(a) * r, gauss(0.25), Math.sin(a) * r);
+    }
+  }
+  return out;
+}
+
+// ─── Summit for ASCENT: a mountain range with a trail switchbacking up to the peak ───
+function summit(count) {
+  const out = new Float32Array(count * 3);
+  const height = (x, z) =>
+    2.3 * Math.exp(-(x * x + z * z) / 1.6) + 0.9 * Math.exp(-((x + 1.9) ** 2 + (z - 0.4) ** 2) / 0.7) +
+    0.7 * Math.exp(-((x - 2.0) ** 2 + (z + 0.3) ** 2) / 0.6);
+  const trailShare = Math.floor(count * 0.16);
+  const peakShare = Math.floor(count * 0.04);
+  for (let i = 0; i < count; i++) {
+    let x, z;
+    if (i < trailShare) {
+      // Switchbacks: zig-zag in x while climbing toward the summit at the origin
+      const t = Math.random();
+      const r = 2.6 * (1 - t);
+      x = Math.sin(t * Math.PI * 7) * r * 0.45 + gauss(0.02);
+      z = r * 0.9 + gauss(0.02);
+    } else if (i < trailShare + peakShare) {
+      // A bright cluster where the trail ends
+      x = gauss(0.06);
+      z = gauss(0.06);
+    } else {
+      // Terrain: denser near the ridges, sampled across a disc
+      const a = Math.random() * TAU;
+      const r = Math.sqrt(Math.random()) * 3.2;
+      x = Math.cos(a) * r;
+      z = Math.sin(a) * r;
+    }
+    const y = height(x, z) - 1.2 + (i < trailShare + peakShare ? 0.04 : gauss(0.015));
+    put(out, i, x, y, z);
+  }
+  return out;
+}
+
+// ─── Interstellar dust: a quiet, wide scatter for sections whose own content is the visual ───
+function dust(count) {
+  const out = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    put(out, i, rand(-6.5, 6.5), gauss(1.3), rand(-3, 2));
+  }
+  return out;
+}
+
+export const SHAPES = { planet, neural, chain, systems, shield, fractions, route, galaxy, blackhole, dust, summit };
 
 // Shapes that sit in the middle of the screen instead of beside the text
-export const CENTERED_SHAPES = new Set(['galaxy']);
+export const CENTERED_SHAPES = new Set(['galaxy', 'blackhole', 'dust']);
+
+// Shapes that face the camera instead of slowly turning (the black hole's lensed ring must stay round)
+export const STILL_SHAPES = new Set(['blackhole']);

@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import SolarSystem from './SolarSystem';
 
-const languages = ['Python', 'JavaScript', 'Rust', 'C++', 'Solidity', 'Noir', 'TypeScript'];
-const tools = ['React', 'Next.js', 'Tailwind', 'FastAPI', 'Node.js', 'Foundry', 'Solana', 'Docker', 'Linux', 'Git', 'Blender'];
+const languages = ['Solidity', 'Noir', 'TypeScript', 'Python', 'Rust', 'JavaScript', 'C++'];
+const tools = ['Foundry', 'Next.js', 'React Native', 'FastAPI', 'Node.js', 'Anchor', 'Solana', 'MongoDB', 'ESP32', 'Docker', 'Linux', 'Git'];
 
 // An endless band: the list is rendered twice and the track slides by exactly half its width
 const Band = ({ words, reverse, outlined }) => (
@@ -43,14 +44,17 @@ const TechStack = () => {
         <Band words={tools} reverse outlined />
       </div>
 
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="mt-12 font-mono text-sm text-muted leading-relaxed"
+      {/* Particles scatter into faint dust so the solar system stands on its own */}
+      <motion.div
+        data-shape="dust"
+        initial={{ opacity: 0, scale: 0.94 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.9, ease: 'easeOut' }}
+        className="mt-20 md:mt-28"
       >
-        <span className="text-accent">Exploring →</span> Kubernetes · AWS (EC2, ECS, ECR, Auto Scaling) · CI/CD · Monitoring
-      </motion.p>
+        <SolarSystem />
+      </motion.div>
     </section>
   );
 };

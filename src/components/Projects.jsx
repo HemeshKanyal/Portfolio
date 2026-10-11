@@ -1,117 +1,157 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { projects, otherBuilds } from '../data/projects';
 
-const projectsData = [
-  {
-    title: 'RiskLens',
-    shape: 'shield',
-    status: 'Live',
-    tagline: 'Portfolio risk intelligence, provable on-chain.',
-    description: 'An AI risk engine that analyses portfolios, backtests strategies and simulates scenarios — then anchors each risk snapshot on-chain with a zero-knowledge proof.',
-    moreInfo: 'RiskLens pairs a Python risk engine with zero-knowledge attestations.\n\nThe FastAPI backend computes risk metrics, runs backtests and scenario simulations, tracks how a portfolio\'s risk trends over time, and turns the numbers into plain-language insights with an LLM layer. Holdings can even be imported from a screenshot.\n\nEvery risk snapshot is hashed and proven with a Noir circuit, and the attestation is recorded by Solidity contracts — so anyone can verify a risk claim without seeing the portfolio behind it. Identity checks use the same idea: ZK-KYC instead of handing over documents.',
-    stack: ['Python', 'FastAPI', 'Noir', 'Solidity', 'Next.js'],
-    github: 'https://github.com/HemeshKanyal/RiskLens',
-    live: 'https://risklens.hemeshkanyal.com/',
-  },
-  {
-    title: 'BharatRWA',
-    shape: 'fractions',
-    status: 'Live · in development',
-    tagline: 'Real-world assets, tokenised with private compliance.',
-    description: 'A platform that fractionalises gold, silver, real estate and commodities into ERC-20 tokens, with KYC proven in zero knowledge instead of shared.',
-    moreInfo: 'BharatRWA turns physical assets into tradable, fractional tokens while keeping investors\' identities private.\n\nFoundry contracts handle the asset registry, compliance, price oracles and dividend distribution. A Noir circuit proves a user is over 18, KYC-verified and not sanctioned — without revealing who they are — and the proof is verified on-chain before any transfer.\n\nA Node.js service generates proofs and aggregates market data, and a Next.js exchange UI shows live charts and order books on the Sepolia testnet.',
-    stack: ['Solidity', 'Foundry', 'Noir', 'Node.js', 'Next.js'],
-    github: 'https://github.com/HemeshKanyal/BharatRWA',
-    live: 'https://bharatrwa.hemeshkanyal.com/',
-  },
-  {
-    title: 'TrustChain',
-    shape: 'route',
-    status: 'Live · team of 6',
-    tagline: 'Every medicine, traceable from factory to patient.',
-    description: 'A blockchain supply chain for medicines, with IoT sensors logging each shipment\'s location and conditions on-chain.',
-    moreInfo: 'TrustChain tracks medicines across the whole supply chain — manufacturer → distributor → pharmacy → doctor → patient — so every pack can be verified, traced and trusted.\n\nEach role has its own Solidity contract. Manufacturers register medicines with unique IDs, distributors and pharmacies record every hand-off, and patients can look up a medicine\'s full journey to check it\'s genuine.\n\nIoT devices (GPS, RFID and temperature/humidity sensors) stream shipment data on-chain, and an AI module flags expiry and authenticity issues. The whole stack runs with Docker Compose.',
-    stack: ['Solidity', 'React', 'Node.js', 'Python', 'IoT'],
-    github: 'https://github.com/HemeshKanyal/trustchain',
-    live: 'https://trustchain.hemeshkanyal.com/',
-  }
-];
+const HASH_PREFIX = '#work/';
 
-const otherBuilds = [
-  { title: 'Dev Growth OS', note: 'Productivity OS for developers · React, Supabase', href: 'https://dev-growth-os.hemeshkanyal.com/' },
-  { title: 'ASCENT', note: 'Workout app with split recommendations · React Native, Express', href: 'https://github.com/HemeshKanyal/ASCENT-Frontend' },
-  { title: 'Coin Flip DApp', note: 'On-chain game · Solidity', href: 'https://coinflip-dapp-kappa.vercel.app' },
-  { title: 'Mentor Voting DApp', note: 'Transparent voting · Solidity', href: 'https://mentor-voting-dapp.vercel.app' },
-];
+const SectionLabel = ({ children }) => (
+  <h4 className="font-mono text-xs uppercase tracking-[0.25em] text-accent mb-5">{children}</h4>
+);
 
-const ProjectModal = ({ project, onClose }) => {
-  if (!project) return null;
+// The case study behind "View details": a sheet from the right with the problem, what was
+// built, how it works, honest limits and links. Closes on Esc, the backdrop or the button.
+const CaseStudy = ({ project, index, onClose }) => {
+  const headingRef = useRef(null);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+    const onKey = (e) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/40 backdrop-blur-md"
+      className="fixed inset-0 z-[100] flex justify-end bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.9, opacity: 0, y: 20 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-2xl bg-foreground/5 border border-foreground/10 backdrop-blur-2xl rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden"
+      <motion.article
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="case-study-title"
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 32, stiffness: 260 }}
+        className="relative h-full w-full max-w-3xl overflow-y-auto overscroll-contain border-l border-foreground/10 bg-background/90 backdrop-blur-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full bg-foreground/5 hover:bg-foreground/10 transition-colors group"
+          aria-label="Close"
+          className="sticky top-5 float-right mr-5 z-10 p-2.5 rounded-full border border-foreground/10 bg-background/70 backdrop-blur-md text-foreground/60 hover:text-foreground hover:border-foreground/30 transition-colors"
         >
-          <svg className="w-6 h-6 text-foreground/50 group-hover:text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        <span className="text-accent font-mono text-xs tracking-widest uppercase mb-4 block">
-          Project Details
-        </span>
-        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4 tracking-tight">
-          {project.title}
-        </h2>
-        <p className="text-xl md:text-2xl text-accent/90 font-medium mb-8">
-          {project.tagline}
-        </p>
-
-        <div className="space-y-6 mb-10">
-          <p className="text-lg text-foreground/80 leading-relaxed whitespace-pre-wrap">
-            {project.moreInfo}
+        <div className="px-6 md:px-14 pt-16 pb-20">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs uppercase tracking-[0.25em] mb-5">
+            <span className="text-accent">0{index + 1} // Case study</span>
+            <span className="text-muted">{project.status}</span>
+          </div>
+          <h2
+            id="case-study-title"
+            ref={headingRef}
+            tabIndex={-1}
+            className="text-5xl md:text-7xl font-bold tracking-tighter text-foreground mb-4 outline-none"
+          >
+            {project.title}
+          </h2>
+          <p className="text-2xl md:text-3xl text-accent font-display font-medium leading-tight mb-10">
+            {project.tagline}
           </p>
-        </div>
 
-        <div className="flex flex-wrap gap-4">
-          {project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 bg-foreground text-background font-semibold rounded-full hover:bg-foreground/90 transition-all flex items-center gap-2"
-            >
-              GitHub Repo
-            </a>
+          <div className="flex flex-wrap gap-3 mb-14">
+            {project.links.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`group px-6 py-2.5 rounded-full font-semibold transition-all ${
+                  link.primary
+                    ? 'bg-accent text-background hover:bg-accent-hover shadow-[0_0_40px_-10px_rgba(242,196,109,0.6)]'
+                    : 'border border-foreground/20 text-foreground hover:border-accent/50 hover:text-accent'
+                }`}
+              >
+                {link.label} <span className="inline-block transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+              </a>
+            ))}
+          </div>
+
+          <dl className="grid grid-cols-3 gap-4 mb-16 border-y border-foreground/10 py-8">
+            {project.stats.map(([value, label]) => (
+              <div key={label}>
+                <dt className="sr-only">{label}</dt>
+                <dd className="font-display text-3xl md:text-5xl font-bold text-foreground tracking-tight">{value}</dd>
+                <dd className="mt-2 text-sm text-muted leading-snug">{label}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <section className="mb-14">
+            <SectionLabel>The problem</SectionLabel>
+            <p className="text-lg md:text-xl text-foreground/85 leading-relaxed">{project.problem}</p>
+          </section>
+
+          <section className="mb-14">
+            <SectionLabel>What I built</SectionLabel>
+            <ul className="space-y-4">
+              {project.built.map((item) => (
+                <li key={item} className="flex gap-4 text-foreground/85 leading-relaxed">
+                  <span aria-hidden="true" className="text-accent mt-1 shrink-0">✦</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section className="mb-14">
+            <SectionLabel>How it works</SectionLabel>
+            <ol className="relative border-l border-foreground/15 ml-2 space-y-6">
+              {project.flow.map((step, i) => (
+                <li key={step} className="relative pl-8 text-foreground/85 leading-relaxed">
+                  <span className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full border border-accent/60 bg-background flex items-center justify-center">
+                    <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+                  </span>
+                  <span className="font-mono text-xs text-muted mr-3">0{i + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </section>
+
+          {project.limits && (
+            <section className="mb-14">
+              <SectionLabel>Honest limits</SectionLabel>
+              <ul className="space-y-3 rounded-2xl border border-foreground/10 bg-foreground/[0.03] p-6">
+                {project.limits.map((item) => (
+                  <li key={item} className="flex gap-3 text-muted leading-relaxed">
+                    <span aria-hidden="true" className="shrink-0">—</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-          {project.live !== '#' && (
-            <a
-              href={project.live}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-6 py-2.5 border border-foreground/20 text-foreground font-semibold rounded-full hover:bg-foreground/5 transition-all"
-            >
-              Live Demo
-            </a>
-          )}
+
+          <section>
+            <SectionLabel>Stack</SectionLabel>
+            <ul className="flex flex-wrap gap-2">
+              {project.stack.map((t) => (
+                <li key={t} className="px-3 py-1 rounded-full border border-foreground/10 bg-foreground/[0.03] font-mono text-xs text-foreground/80">
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </section>
         </div>
-      </motion.div>
+      </motion.article>
     </motion.div>
   );
 };
@@ -183,41 +223,82 @@ const ProjectBlock = ({ project, index, onOpen }) => {
             </li>
           ))}
         </ul>
-        <button
-          onClick={() => onOpen(project)}
-          className="group inline-flex items-center text-accent hover:text-accent-hover font-medium transition-colors text-lg"
-        >
-          View details
-          <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-          </svg>
-        </button>
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+          <button
+            onClick={(e) => onOpen(project, e.currentTarget)}
+            className="group inline-flex items-center text-accent hover:text-accent-hover font-medium transition-colors text-lg"
+          >
+            View case study
+            <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </button>
+          <a
+            href={project.links[0].href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted hover:text-foreground transition-colors"
+          >
+            {project.links[0].label} ↗
+          </a>
+        </div>
       </motion.div>
     </motion.div>
   );
 };
 
+const slugFromHash = () =>
+  window.location.hash.startsWith(HASH_PREFIX) ? window.location.hash.slice(HASH_PREFIX.length) : null;
+
 const Projects = () => {
-  const [selectedProject, setSelectedProject] = useState(null);
+  // A case study is addressable as #work/<slug>, so it can be shared and survives a reload
+  const [openSlug, setOpenSlug] = useState(slugFromHash);
+  const triggerRef = useRef(null);
+  const openIndex = projects.findIndex((p) => p.slug === openSlug);
+  const isOpen = openIndex >= 0;
+
+  // Lock page scroll while a case study is open. Tied to the open state rather than the sheet's
+  // lifetime, so scrolling comes back the moment it closes, not after the exit animation.
+  useEffect(() => {
+    if (!isOpen) return;
+    const root = document.documentElement;
+    const prev = root.style.overflow;
+    root.style.overflow = 'hidden';
+    return () => { root.style.overflow = prev; };
+  }, [isOpen]);
+
+  useEffect(() => {
+    const onHash = () => setOpenSlug(slugFromHash());
+    window.addEventListener('hashchange', onHash);
+    // Arriving on a shared link: bring the project into view behind the sheet
+    if (slugFromHash()) document.getElementById(`project-${slugFromHash()}`)?.scrollIntoView();
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  const open = useCallback((project, trigger) => {
+    triggerRef.current = trigger;
+    window.history.replaceState(null, '', `${HASH_PREFIX}${project.slug}`);
+    setOpenSlug(project.slug);
+  }, []);
+
+  const close = useCallback(() => {
+    window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    setOpenSlug(null);
+    triggerRef.current?.focus();
+  }, []);
 
   return (
     <section id="projects" className="w-full flex flex-col">
-      {projectsData.map((project, idx) => (
-        <ProjectBlock
-          key={project.title}
-          project={project}
-          index={idx}
-          onOpen={setSelectedProject}
-        />
+      {projects.map((project, idx) => (
+        <div key={project.slug} id={`project-${project.slug}`}>
+          <ProjectBlock project={project} index={idx} onOpen={open} />
+        </div>
       ))}
       <OtherProjects />
 
       <AnimatePresence>
-        {selectedProject && (
-          <ProjectModal
-            project={selectedProject}
-            onClose={() => setSelectedProject(null)}
-          />
+        {isOpen && (
+          <CaseStudy project={projects[openIndex]} index={openIndex} onClose={close} />
         )}
       </AnimatePresence>
     </section>

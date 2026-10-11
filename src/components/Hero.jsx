@@ -1,14 +1,38 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import HeavyWord from './HeavyWord';
+
+// Fallback in case WebGL is unavailable and the Big Bang never fires
+const BANG_TIMEOUT_MS = 2500;
 
 const Hero = () => {
+  // The copy arrives with the Big Bang in the background (see three/cosmos.js)
+  const [ready, setReady] = useState(() => document.documentElement.dataset.bang === '1');
+  const [canHold] = useState(() =>
+    window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  useEffect(() => {
+    const show = () => setReady(true);
+    // The Big Crunch restarts the universe, and the intro with it
+    const hide = () => setReady(false);
+    const timer = ready ? 0 : setTimeout(show, BANG_TIMEOUT_MS);
+    window.addEventListener('cosmos:bang', show);
+    window.addEventListener('cosmos:crunch', hide);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('cosmos:bang', show);
+      window.removeEventListener('cosmos:crunch', hide);
+    };
+  }, [ready]);
+
   const container = {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
       transition: {
         staggerChildren: 0.12,
-        delayChildren: 0.2,
+        delayChildren: 0.35,
       }
     }
   };
@@ -22,7 +46,7 @@ const Hero = () => {
 
   return (
     <section id="home" data-shape="planet" className="min-h-screen flex flex-col justify-center relative pt-24 pb-16">
-      <motion.div variants={container} initial="hidden" animate="show">
+      <motion.div variants={container} initial="hidden" animate={ready ? 'show' : 'hidden'}>
         <motion.p
           variants={item}
           className="font-mono text-xs md:text-sm uppercase tracking-[0.3em] text-accent mb-6 md:mb-8"
@@ -34,14 +58,14 @@ const Hero = () => {
           variants={item}
           className="font-display font-bold tracking-tighter leading-[0.82] text-[22vw] md:text-[11rem] lg:text-[13rem] xl:text-[14.5rem] text-foreground drop-shadow-[0_2px_24px_rgba(5,6,11,0.6)]"
         >
-          Hemesh
+          <HeavyWord text="Hemesh" />
         </motion.h1>
         <motion.p
           variants={item}
           aria-hidden="true"
           className="font-display font-bold tracking-tighter leading-[0.82] text-[22vw] md:text-[11rem] lg:text-[13rem] xl:text-[14.5rem] text-outline-accent mb-10 md:mb-14 select-none"
         >
-          Kanyal
+          <HeavyWord text="Kanyal" />
         </motion.p>
 
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
@@ -78,7 +102,7 @@ const Hero = () => {
 
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        animate={{ opacity: ready ? 1 : 0 }}
         transition={{ delay: 1.6, duration: 0.8 }}
         className="absolute bottom-8 left-0 hidden md:flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em] text-muted"
       >
@@ -87,6 +111,17 @@ const Hero = () => {
         </span>
         Scroll
       </motion.div>
+
+      {canHold && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: ready ? 1 : 0 }}
+          transition={{ delay: 2.2, duration: 0.8 }}
+          className="absolute bottom-8 right-0 hidden md:block font-mono text-xs uppercase tracking-[0.25em] text-muted"
+        >
+          Hold anywhere <span className="text-accent">·</span> bend spacetime
+        </motion.p>
+      )}
     </section>
   );
 };

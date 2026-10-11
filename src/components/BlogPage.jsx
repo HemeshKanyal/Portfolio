@@ -5,10 +5,12 @@ import { ArrowLeft } from 'lucide-react';
 import { blogs } from '../data/blogs';
 import BlogCard from './BlogCard';
 import BlogModal from './BlogModal';
+import { useWormhole } from '../hooks/useWormhole';
 
 const BlogPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const warpHome = useWormhole('/');
   const selectedBlog = slug ? blogs.find(b => b.slug === slug) ?? null : null;
 
   // Sorting blogs to show newest at top by date
@@ -45,6 +47,7 @@ const BlogPage = () => {
             >
               <Link 
                 to="/" 
+                onClick={warpHome}
                 className="flex items-center gap-2 text-accent font-medium mb-8 hover:opacity-80 transition-opacity"
               >
                 <ArrowLeft size={18} />
